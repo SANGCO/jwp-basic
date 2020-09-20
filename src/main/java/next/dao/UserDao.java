@@ -26,14 +26,15 @@ public class UserDao {
     }
 
     public User findByUserId(String userId) throws SQLException {
+        ResultSet rs = null;
 
         try (
             Connection con = ConnectionManager.getConnection();
             PreparedStatement pstmt = con.prepareStatement(
                     "SELECT userId, password, name, email FROM USERS WHERE userid=?");
-            ResultSet rs = pstmt.executeQuery();
         ) {
             pstmt.setString(1, userId);
+            rs = pstmt.executeQuery();
             User user = null;
             if (rs.next()) {
                 user = new User(
@@ -42,6 +43,10 @@ public class UserDao {
             }
 
             return user;
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
         }
     }
 }
