@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import core.db.DataBase;
+import next.model.User;
 
 @WebServlet("/user/list")
 public class ListUserServlet extends HttpServlet {
