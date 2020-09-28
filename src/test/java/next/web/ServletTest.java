@@ -12,9 +12,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 public class ServletTest {
@@ -36,6 +37,7 @@ public class ServletTest {
     public void listUserServlet_forwardedUrl_test() throws ServletException, IOException {
         ListUserServlet listUserServlet = new ListUserServlet();
         listUserServlet.doGet(request, response);
+
         assertEquals("/user/list.jsp", response.getForwardedUrl());
     }
 
@@ -43,6 +45,7 @@ public class ServletTest {
     public void createUserServlet_redirect_test() throws ServletException, IOException {
         CreateUserServlet createUserServlet = new CreateUserServlet();
         createUserServlet.doPost(request, response);
+
         assertEquals("/user/list", response.getRedirectedUrl());
     }
 
@@ -51,6 +54,7 @@ public class ServletTest {
         request.setParameter("userId", "SANGCO");
         UpdateUserFormServlet updateUserFormServlet = new UpdateUserFormServlet();
         updateUserFormServlet.doGet(request, response);
+
         assertEquals("/user/updateForm.jsp", response.getForwardedUrl());
     }
 
@@ -60,6 +64,7 @@ public class ServletTest {
         UpdateUserFormServlet updateUserFormServlet = new UpdateUserFormServlet();
         updateUserFormServlet.doGet(request, response);
         User user = (User) request.getAttribute("user");
+
         assertEquals("SANGCO", user.getUserId());
     }
 
@@ -72,13 +77,72 @@ public class ServletTest {
 
     @Test
     public void updateUserServlet_updateUser_test() throws ServletException, IOException {
-        request.setParameter("userId", "SANGCO");
-        request.setParameter("password", "password123");
-        request.setParameter("name", "수정한 상코");
-        request.setParameter("email", "sangco123@gmail.com");
+        // TODO 지저분한데 리팩토링 가나?
+        User updateUser = new User("SANGCO", "password123",
+                "수정한 상코", "sangco123@gmail.com");
+        request.setParameter("userId", updateUser.getUserId());
+        request.setParameter("password", updateUser.getPassword());
+        request.setParameter("name", updateUser.getName());
+        request.setParameter("email", updateUser.getEmail());
         UpdateUserServlet updateUserServlet = new UpdateUserServlet();
         updateUserServlet.doPost(request, response);
+        User user = DataBase.findUserById(updateUser.getUserId());
+
+        assertEquals(updateUser.getPassword(), user.getPassword());
         assertEquals("/", response.getRedirectedUrl());
+
+        updateUser = new User("SANGCO", "password",
+                "수정한 상코", "sangco123@gmail.com");
+        user.update(updateUser);
+    }
+
+    @Test
+    public void LoginServlet_view_test() throws ServletException, IOException {
+        LoginServlet LoginServlet = new LoginServlet();
+        LoginServlet.doGet(request, response);
+
+        assertEquals("/user/login.jsp", response.getForwardedUrl());
+    }
+
+    @Test
+    public void LoginServlet_login_test() throws ServletException, IOException {
+        request.setParameter("userId", "SANGCO");
+        request.setParameter("password", "password");
+        LoginServlet LoginServlet = new LoginServlet();
+        LoginServlet.doPost(request, response);
+        HttpSession session = request.getSession();
+        User sessionUser = (User) session.getAttribute("user");
+
+        assertNotNull(sessionUser);
+        assertEquals("/", response.getRedirectedUrl());
+    }
+
+    @Test
+    public void LoginServlet_fail_password_test() throws ServletException, IOException {
+        request.setParameter("userId", "SANGCO");
+        request.setParameter("password", "password1234");
+        LoginServlet LoginServlet = new LoginServlet();
+        LoginServlet.doPost(request, response);
+        HttpSession session = request.getSession();
+        Boolean loginFailed = (Boolean) request.getAttribute("loginFailed");
+
+        assertTrue(loginFailed);
+        assertNull(session.getAttribute("user"));
+        assertEquals("/user/login.jsp", response.getForwardedUrl());
+    }
+
+    @Test
+    public void LoginServlet_fail_id_notFound_test() throws ServletException, IOException {
+        request.setParameter("userId", "SANGCO");
+        request.setParameter("password", "password1234");
+        LoginServlet LoginServlet = new LoginServlet();
+        LoginServlet.doPost(request, response);
+        HttpSession session = request.getSession();
+        Boolean loginFailed = (Boolean) request.getAttribute("loginFailed");
+
+        assertTrue(loginFailed);
+        assertNull(session.getAttribute("user"));
+        assertEquals("/user/login.jsp", response.getForwardedUrl());
     }
 
 }

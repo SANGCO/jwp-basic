@@ -13,10 +13,18 @@ public class User {
         this.email = email;
     }
 
-    public void update(User user) {
-        this.password = password;
-        this.name = name;
-        this.email = email;
+    public void update(User updateUser) {
+        this.password = updateUser.password;
+        this.name = updateUser.name;
+        this.email = updateUser.email;
+    }
+
+    public boolean matchPassword(String password) {
+        if (password == null) {
+            return false;
+        }
+
+        return this.password.equals(password);
     }
 
     public String getUserId() {
