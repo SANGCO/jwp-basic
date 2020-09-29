@@ -51,34 +51,34 @@ public class ServletTest {
 
     @Test
     public void updateUserFormServlet_forwardedUrl_test() throws ServletException, IOException {
-        request.setParameter("userId", "SANGCO");
-        UpdateUserFormServlet updateUserFormServlet = new UpdateUserFormServlet();
-        updateUserFormServlet.doGet(request, response);
+        request.setParameter("userId", "sangco");
+        UpdateUserServlet updateUserServlet = new UpdateUserServlet();
+        updateUserServlet.doGet(request, response);
 
         assertEquals("/user/updateForm.jsp", response.getForwardedUrl());
     }
 
     @Test
     public void updateUserFormServlet_findUser_test() throws ServletException, IOException {
-        request.setParameter("userId", "SANGCO");
-        UpdateUserFormServlet updateUserFormServlet = new UpdateUserFormServlet();
-        updateUserFormServlet.doGet(request, response);
+        request.setParameter("userId", "sangco");
+        UpdateUserServlet updateUserServlet = new UpdateUserServlet();
+        updateUserServlet.doGet(request, response);
         User user = (User) request.getAttribute("user");
 
-        assertEquals("SANGCO", user.getUserId());
+        assertEquals("sangco", user.getUserId());
     }
 
     @Test(expected = IllegalStateException.class)
     public void updateUserFormServlet_findUser_Exception_test() throws ServletException, IOException {
         request.setParameter("userId", "김아무개");
-        UpdateUserFormServlet updateUserFormServlet = new UpdateUserFormServlet();
-        updateUserFormServlet.doGet(request, response);
+        UpdateUserServlet updateUserServlet = new UpdateUserServlet();
+        updateUserServlet.doGet(request, response);
     }
 
     @Test
     public void updateUserServlet_updateUser_test() throws ServletException, IOException {
         // TODO 지저분한데 리팩토링 가나?
-        User updateUser = new User("SANGCO", "password123",
+        User updateUser = new User("sangco", "password123",
                 "수정한 상코", "sangco123@gmail.com");
         request.setParameter("userId", updateUser.getUserId());
         request.setParameter("password", updateUser.getPassword());
@@ -91,7 +91,7 @@ public class ServletTest {
         assertEquals(updateUser.getPassword(), user.getPassword());
         assertEquals("/", response.getRedirectedUrl());
 
-        updateUser = new User("SANGCO", "password",
+        updateUser = new User("sangco", "password",
                 "수정한 상코", "sangco123@gmail.com");
         user.update(updateUser);
     }
@@ -106,7 +106,7 @@ public class ServletTest {
 
     @Test
     public void LoginServlet_login_test() throws ServletException, IOException {
-        request.setParameter("userId", "SANGCO");
+        request.setParameter("userId", "sangco");
         request.setParameter("password", "password");
         LoginServlet LoginServlet = new LoginServlet();
         LoginServlet.doPost(request, response);
@@ -119,7 +119,7 @@ public class ServletTest {
 
     @Test
     public void LoginServlet_fail_password_test() throws ServletException, IOException {
-        request.setParameter("userId", "SANGCO");
+        request.setParameter("userId", "sangco");
         request.setParameter("password", "password1234");
         LoginServlet LoginServlet = new LoginServlet();
         LoginServlet.doPost(request, response);
@@ -133,7 +133,7 @@ public class ServletTest {
 
     @Test
     public void LoginServlet_fail_id_notFound_test() throws ServletException, IOException {
-        request.setParameter("userId", "SANGCO");
+        request.setParameter("userId", "sangco");
         request.setParameter("password", "password1234");
         LoginServlet LoginServlet = new LoginServlet();
         LoginServlet.doPost(request, response);
@@ -143,6 +143,19 @@ public class ServletTest {
         assertTrue(loginFailed);
         assertNull(session.getAttribute("user"));
         assertEquals("/user/login.jsp", response.getForwardedUrl());
+    }
+
+    @Test
+    public void logoutServlet_test() throws ServletException, IOException {
+        User user = new User("sangco", "password123",
+                "수정한 상코", "sangco123@gmail.com");
+        HttpSession session = request.getSession();
+        session.setAttribute("user", user);
+        LogoutServlet logoutServlet = new LogoutServlet();
+        logoutServlet.doGet(request, response);
+        HttpSession logoutSession = request.getSession();
+
+        assertNull(logoutSession.getAttribute("user"));
     }
 
 }
