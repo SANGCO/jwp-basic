@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-import static next.web.UserSessionUtils.isLogined;
 import static next.web.UserSessionUtils.isSameUser;
 
 @WebServlet("/user/update")

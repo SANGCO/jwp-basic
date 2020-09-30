@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 import core.db.DataBase;
 import next.model.User;
 
+import static next.web.UserSessionUtils.isLogined;
+
 @WebServlet("/user/list")
 public class ListUserController extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -20,7 +22,7 @@ public class ListUserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
-        if (UserSessionUtils.isLogined(session)) {
+        if (!isLogined(session)) {
             resp.sendRedirect("/user/loginForm");
             return;
         }

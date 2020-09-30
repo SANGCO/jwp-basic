@@ -8,7 +8,11 @@ public class UserSessionUtils {
 
     public static boolean isLogined(HttpSession session) {
         User user = (User) session.getAttribute("user");
-        return user != null;
+
+        if (user == null) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean isSameUser(HttpSession session, User user) {
