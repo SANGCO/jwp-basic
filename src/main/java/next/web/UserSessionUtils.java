@@ -10,4 +10,18 @@ public class UserSessionUtils {
         User user = (User) session.getAttribute("user");
         return user != null;
     }
+
+    public static boolean isSameUser(HttpSession session, User user) {
+        if (!isLogined(session)) {
+            return false;
+        }
+
+        if (user == null) {
+            return false;
+        }
+
+        User sessionUser = (User) session.getAttribute("user");
+        return sessionUser.isSameUser(user);
+    }
+
 }

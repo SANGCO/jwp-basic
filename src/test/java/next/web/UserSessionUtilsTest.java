@@ -9,8 +9,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.HttpSession;
 
-import static next.dao.UserTest.DEFAUlTUSER;
+import static next.dao.UserTest.*;
 import static next.web.ControllerTest.login;
+import static next.web.UserSessionUtils.isSameUser;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class UserSessionUtilsTest {
 
@@ -34,6 +37,70 @@ public class UserSessionUtilsTest {
 
         // Then
         Assert.assertFalse(logined);
+    }
+
+    @Test
+    public void isLogined_test() {
+        // Given
+        login(request);
+        HttpSession session = request.getSession();
+
+        // When
+        boolean logined = UserSessionUtils.isLogined(session);
+
+        // Then
+        assertTrue(logined);
+    }
+
+    @Test
+    public void isSameUser_login_failTest() {
+        // Given
+        HttpSession session = request.getSession();
+
+        // When
+        boolean sameUser = isSameUser(session, DEFAUlTUSER);
+
+        //Then
+        assertFalse(sameUser);
+    }
+
+    @Test
+    public void isSameUser_null_failTest() {
+        // Given
+        login(request);
+        HttpSession session = request.getSession();
+
+        // When
+        boolean sameUser = isSameUser(session, null);
+
+        //Then
+        assertFalse(sameUser);
+    }
+
+    @Test
+    public void isSameUser_sameUser_failTest() {
+        // Given
+        login(request);
+        HttpSession session = request.getSession();
+
+        // When
+        boolean sameUser = isSameUser(session, ANOTHERUSER);
+
+        //Then
+        assertFalse(sameUser);
+    }
+
+    @Test
+    public void isSameUser_test() {
+        // Given
+        login(request);
+        HttpSession session = request.getSession();
+
+        // When
+        boolean sameUser = isSameUser(session, DEFAUlTUSER);
+
+        //Then
+        assertTrue(sameUser);
     }
 
 }

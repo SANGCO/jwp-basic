@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 public class UserTest {
     public static final User DEFAUlTUSER = new User("sangco", "password", "상코", "sangco@gmail.com");
     public static final User UPDATEUSER = new User("sangco", "password123", "수정한 상코", "sangco123@gmail.com");
+    public static final User ANOTHERUSER = new User("sangsoon", "password", "상", "sangsoon@gmail.com");
 
     @Test
     public void update_test() {
@@ -60,6 +61,30 @@ public class UserTest {
 
         // Then
         assertFalse(isMatched);
+    }
+
+    @Test
+    public void isSameUser_failTest() {
+        // Given
+        User user = getUserById(DEFAUlTUSER.getUserId());
+
+        // When
+        boolean sameUser = user.isSameUser(ANOTHERUSER);
+
+        // Then
+        assertFalse(sameUser);
+    }
+
+    @Test
+    public void isSameUser_test() {
+        // Given
+        User user = getUserById(DEFAUlTUSER.getUserId());
+
+        // When
+        boolean sameUser = user.isSameUser(DEFAUlTUSER);
+
+        // Then
+        assertTrue(sameUser);
     }
 
     private User getUserById(String userId) {

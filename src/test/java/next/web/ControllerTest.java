@@ -12,8 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-import static next.dao.UserTest.DEFAUlTUSER;
-import static next.dao.UserTest.UPDATEUSER;
+import static next.dao.UserTest.*;
 import static org.junit.Assert.*;
 
 
@@ -65,9 +64,35 @@ public class ControllerTest {
         assertEquals("/user/list", response.getRedirectedUrl());
     }
 
-    @Test
-    public void updateUserFormController_forwardedUrl_test() throws ServletException, IOException {
+    @Test(expected = IllegalStateException.class)
+    public void updateUserController_doGet_isSameUser_login_failTest() throws ServletException, IOException {
         // Given
+        request.setParameter("userId", DEFAUlTUSER.getUserId());
+        UpdateUserController updateUserController = new UpdateUserController();
+
+        // When
+        updateUserController.doGet(request, response);
+
+        // Then Expected Exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void updateUserController_doGet_isSameUser_user_failTest() throws ServletException, IOException {
+        // Given
+        login(request);
+        request.setParameter("userId", ANOTHERUSER.getUserId());
+        UpdateUserController updateUserController = new UpdateUserController();
+
+        // When
+        updateUserController.doGet(request, response);
+
+        // Then Expected Exception
+    }
+
+    @Test
+    public void updateUserController_doGet_test() throws ServletException, IOException {
+        // Given
+        login(request);
         request.setParameter("userId", DEFAUlTUSER.getUserId());
         UpdateUserController updateUserController = new UpdateUserController();
 
@@ -78,39 +103,36 @@ public class ControllerTest {
         assertEquals("/user/updateForm.jsp", response.getForwardedUrl());
     }
 
-    @Test
-    public void updateUserFormController_findUser_test() throws ServletException, IOException {
+    @Test(expected = IllegalStateException.class)
+    public void updateUserController_doPost_isSameUser_login_failTest() throws ServletException, IOException {
         // Given
         request.setParameter("userId", DEFAUlTUSER.getUserId());
         UpdateUserController updateUserController = new UpdateUserController();
 
         // When
-        updateUserController.doGet(request, response);
-        User user = (User) request.getAttribute("user");
+        updateUserController.doPost(request, response);
 
-        // Then
-        assertEquals(DEFAUlTUSER.getUserId(), user.getUserId());
+        // Then Expected Exception
     }
 
     @Test(expected = IllegalStateException.class)
-    public void updateUserFormController_findUser_Exception_test() throws ServletException, IOException {
+    public void updateUserController_doPost_isSameUser_user_failTest() throws ServletException, IOException {
         // Given
-        request.setParameter("userId", "failTestUserId");
-
-        // When
+        login(request);
+        request.setParameter("userId", ANOTHERUSER.getUserId());
         UpdateUserController updateUserController = new UpdateUserController();
 
-        // Then
-        updateUserController.doGet(request, response);
+        // When
+        updateUserController.doPost(request, response);
+
+        // Then Expected Exception
     }
 
     @Test
     public void updateUserController_updateUser_test() throws ServletException, IOException {
-        // TODO 로그인 확인
         // Given
+        login(request);
         setParameter(UPDATEUSER);
-        request.setParameter("name", UPDATEUSER.getName());
-        request.setParameter("email", UPDATEUSER.getEmail());
         UpdateUserController updateUserController = new UpdateUserController();
 
         // When

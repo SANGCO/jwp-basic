@@ -14,6 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+import static next.web.UserSessionUtils.isLogined;
+import static next.web.UserSessionUtils.isSameUser;
+
 @WebServlet("/user/update")
 public class UpdateUserController extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(UpdateUserController.class);
@@ -21,16 +24,12 @@ public class UpdateUserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
-        if (UserSessionUtils.isLogined(session)) {
-            resp.sendRedirect("/user/loginForm");
-            return;
-        }
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
-        if (user == null) {
-            throw new IllegalStateException("수정하려는 회원에 대한 정보가 없습니다.");
-        }
 
+        if (!isSameUser(session, user)) {
+            throw new IllegalStateException("다른 회원의 정볼르 수정할 수 없습니다.");
+        }
         req.setAttribute("user", user);
         RequestDispatcher rd = req.getRequestDispatcher("/user/updateForm.jsp");
         rd.forward(req, resp);
@@ -38,11 +37,12 @@ public class UpdateUserController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO 로그인 확인
-        User user = DataBase.findUserById(req.getParameter("userId"));
+        HttpSession session = req.getSession();
+        String userId = req.getParameter("userId");
+        User user = DataBase.findUserById(userId);
 
-        if (user == null) {
-            throw new IllegalStateException("수정을 요청한 고객에 대한 정보가 없습니다.");
+        if (!isSameUser(session, user)) {
+            throw new IllegalStateException("다른 회원의 정볼르 수정할 수 없습니다.");
         }
         User updateUser = new User(req.getParameter("userId"), req.getParameter("password"),
                                    req.getParameter("name"), req.getParameter("email"));
