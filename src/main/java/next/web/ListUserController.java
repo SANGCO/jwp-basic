@@ -14,14 +14,13 @@ import core.db.DataBase;
 import next.model.User;
 
 @WebServlet("/user/list")
-public class ListUserServlet extends HttpServlet {
+public class ListUserController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
+        if (UserSessionUtils.isLogined(session)) {
             resp.sendRedirect("/user/loginForm");
             return;
         }

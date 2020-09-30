@@ -11,14 +11,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/user/update")
-public class UpdateUserServlet extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(UpdateUserServlet.class);
+public class UpdateUserController extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateUserController.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        if (UserSessionUtils.isLogined(session)) {
+            resp.sendRedirect("/user/loginForm");
+            return;
+        }
         String userId = req.getParameter("userId");
         User user = DataBase.findUserById(userId);
         if (user == null) {
@@ -32,6 +38,7 @@ public class UpdateUserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // TODO 로그인 확인
         User user = DataBase.findUserById(req.getParameter("userId"));
 
         if (user == null) {
